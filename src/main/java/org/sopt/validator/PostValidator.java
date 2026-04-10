@@ -16,6 +16,7 @@ public class PostValidator {
         }
     }
 
+    // 제목 + 내용 검증
     public void validate(String title, String content) {
         validateTitle(title);
         validateContent(content);
