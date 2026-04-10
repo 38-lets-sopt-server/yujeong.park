@@ -9,7 +9,7 @@ public class PostResponse {
     public String author;
     public String createdAt;
 
-    public PostResponse(Long id, String title, String content, String author, String createdAt) {
+    private PostResponse(Long id, String title, String content, String author, String createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
