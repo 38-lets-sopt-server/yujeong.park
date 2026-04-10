@@ -3,6 +3,7 @@ package org.sopt.service;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
+import org.sopt.dto.response.PostResponse;
 import org.sopt.repository.PostRepository;
 
 import java.util.List;
@@ -24,25 +25,43 @@ public class PostService {
         return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
     }
 
-    // READ - 전체 📝 과제
+    // READ - 전체
     public List<PostResponse> getAllPosts() {
-        // TODO
-        return null;
+        return postRepository.findAll()
+                .stream()
+                .map(p -> new PostResponse(p.getId(), p.getTitle(), p.getContent(), p.getAuthor(), p.getCreatedAt()))
+                .toList();
     }
 
-    // READ - 단건 📝 과제
+    // READ - 단건
     public PostResponse getPost(Long id) {
-        // TODO
-        return null;
+        Post post = postRepository.findById(id);
+        if (post == null) {
+            throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id = " + id);
+        }
+        return new PostResponse(post.getId(), post.getTitle(), post.getContent(), post.getAuthor(), post.getCreatedAt());
     }
 
-    // UPDATE 📝 과제
+    // UPDATE
     public void updatePost(Long id, String newTitle, String newContent) {
-        // TODO
+        Post post = postRepository.findById(id);
+        if (post == null) {
+            throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id = " + id);
+        }
+        if (newTitle == null || newTitle.isBlank()) {
+            throw new IllegalArgumentException("제목은 필수입니다!");
+        }
+        if (newContent == null || newContent.isBlank()) {
+            throw new IllegalArgumentException("내용은 필수입니다!");
+        }
+        post.update(newTitle, newContent);
     }
 
-    // DELETE 📝 과제
+    // DELETE
     public void deletePost(Long id) {
-        // TODO
+        boolean deleted = postRepository.deleteById(id);
+        if (!deleted) {
+            throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id=" + id);
+        }
     }
 }
