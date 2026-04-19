@@ -1,9 +1,9 @@
 package org.sopt.common;
 
 public class ApiResponse<T> {
-    public boolean success; // 성공 여부
-    public String message;  // 성공/실패 메시지
-    public T data;          // 성공 시 반환할 데이터
+    private final boolean success; // 성공 여부
+    private final String message;  // 성공/실패 메시지
+    private final T data;          // 성공 시 반환할 데이터
 
     private ApiResponse(boolean success, String message, T data) {
         this.success = success;
@@ -25,4 +25,8 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> fail(String message) {
         return new ApiResponse<>(false, message, null);
     }
+
+    public boolean isSuccess() { return success; }
+    public String getMessage() { return message; }
+    public T getData() { return data; }
 }

@@ -3,11 +3,11 @@ package org.sopt.dto.response;
 import org.sopt.domain.Post;
 
 public class PostResponse {
-    public Long id;
-    public String title;
-    public String content;
-    public String author;
-    public String createdAt;
+    private final Long id;
+    private final String title;
+    private final String content;
+    private final String author;
+    private final String createdAt;
 
     private PostResponse(Long id, String title, String content, String author, String createdAt) {
         this.id = id;
@@ -16,6 +16,12 @@ public class PostResponse {
         this.author = author;
         this.createdAt = createdAt;
     }
+
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public String getContent() { return content; }
+    public String getAuthor() { return author; }
+    public String getCreatedAt() { return createdAt; }
 
     public static PostResponse from(Post post) {
         return new PostResponse(

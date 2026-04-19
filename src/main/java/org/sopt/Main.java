@@ -43,15 +43,15 @@ public class Main {
                     ApiResponse<PostResponse> createResponse = postController.createPost(
                             new CreatePostRequest(title, content, author)
                     );
-                    System.out.println(createResponse.message);
+                    System.out.println(createResponse.getMessage());
                     break;
 
                 case 2:
                     ApiResponse<List<PostResponse>> postListResponse = postController.getAllPosts();
-                    if (postListResponse.data.isEmpty()) {
+                    if (postListResponse.getData().isEmpty()) {
                         System.out.println("등록된 게시글이 없습니다.");
                     } else {
-                        postListResponse.data.forEach(p -> System.out.println(p + "\n---"));
+                        postListResponse.getData().forEach(p -> System.out.println(p + "\n---"));
                     }
                     break;
 
@@ -59,10 +59,10 @@ public class Main {
                     System.out.print("조회할 게시글 ID: ");
                     ApiResponse<PostResponse> postResponse = postController.getPost(scanner.nextLong());
                     scanner.nextLine();
-                    if (postResponse.success) {
-                        System.out.println(postResponse.data);
+                    if (postResponse.isSuccess()) {
+                        System.out.println(postResponse.getData());
                     } else {
-                        System.out.println(postResponse.message);
+                        System.out.println(postResponse.getMessage());
                     }
                     break;
 
@@ -77,14 +77,14 @@ public class Main {
                     ApiResponse<Void> updateResponse = postController.updatePost(
                             updateId, new UpdatePostRequest(newTitle, newContent)
                     );
-                    System.out.println(updateResponse.message);
+                    System.out.println(updateResponse.getMessage());
                     break;
 
                 case 5:
                     System.out.print("삭제할 게시글 ID: ");
                     ApiResponse<Void> deleteResponse = postController.deletePost(scanner.nextLong());
                     scanner.nextLine();
-                    System.out.println(deleteResponse.message);
+                    System.out.println(deleteResponse.getMessage());
                     break;
 
                 case 0:

@@ -17,11 +17,11 @@ public class PostService {
     // CREATE
     public PostResponse createPost(CreatePostRequest request) {
         // 제목, 내용 유효성 검증
-        postValidator.validate(request.title, request.content);
+        postValidator.validate(request.getTitle(), request.getContent());
 
         // 게시글 생성 및 저장
         String createdAt = java.time.LocalDateTime.now().toString();
-        Post post = new Post(postRepository.generateId(), request.title, request.content, request.author, createdAt);
+        Post post = new Post(postRepository.generateId(), request.getTitle(), request.getContent(), request.getAuthor(), createdAt);
         postRepository.save(post);
         return PostResponse.from(post);
     }
@@ -52,8 +52,8 @@ public class PostService {
             throw new PostNotFoundException(id);
         }
         // 새로운 제목, 내용 유효성 검증 후 업데이트
-        postValidator.validate(request.title, request.content);
-        post.update(request.title, request.content);
+        postValidator.validate(request.getTitle(), request.getContent());
+        post.update(request.getTitle(), request.getContent());
     }
 
     // DELETE
