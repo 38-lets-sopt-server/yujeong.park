@@ -6,6 +6,7 @@ import org.sopt.domain.Post;
 public record PostListResponse(
         Long id,
         String title,
+        String content,
         String author,
         String createdAt
 ) {
@@ -13,6 +14,7 @@ public record PostListResponse(
         return new PostListResponse(
                 post.getId(),
                 post.getTitle(),
+                post.getContent(),
                 post.getAuthor(),
                 post.getCreatedAt()
         );
