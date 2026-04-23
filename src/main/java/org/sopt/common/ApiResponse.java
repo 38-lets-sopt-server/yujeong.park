@@ -1,32 +1,19 @@
 package org.sopt.common;
 
-public class ApiResponse<T> {
-    private final boolean success; // 성공 여부
-    private final String message;  // 성공/실패 메시지
-    private final T data;          // 성공 시 반환할 데이터
-
-    private ApiResponse(boolean success, String message, T data) {
-        this.success = success;
-        this.message = message;
-        this.data = data;
+public record ApiResponse<T>(
+        boolean success,
+        String message,
+        T data
+) {
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, "요청이 성공했습니다.", data);
     }
 
-    // 성공 응답 - 데이터 있음
     public static <T> ApiResponse<T> success(String message, T data) {
         return new ApiResponse<>(true, message, data);
     }
 
-    // 성공 응답 - 데이터 없음
-    public static <T> ApiResponse<T> success(String message) {
-        return new ApiResponse<>(true, message, null);
-    }
-
-    // 실패 응답
-    public static <T> ApiResponse<T> fail(String message) {
+    public static <T> ApiResponse<T> error(String message) {
         return new ApiResponse<>(false, message, null);
     }
-
-    public boolean isSuccess() { return success; }
-    public String getMessage() { return message; }
-    public T getData() { return data; }
 }
