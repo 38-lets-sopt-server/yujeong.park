@@ -6,5 +6,4 @@ public record CreatePostRequest(
         String content,
         String author
 ) {
-
 }

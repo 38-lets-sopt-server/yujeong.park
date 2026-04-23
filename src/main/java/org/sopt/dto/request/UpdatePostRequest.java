@@ -5,5 +5,4 @@ public record UpdatePostRequest(
         String title,
         String content
 ) {
-
 }
