@@ -1,5 +1,7 @@
 package org.sopt.validator;
 
+import org.sopt.exception.PostErrorCode;
+import org.sopt.exception.PostException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,17 +12,17 @@ public class PostValidator {
     // 제목 검증
     public void validateTitle(String title) {
         if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("제목은 필수입니다!");
+            throw new PostException(PostErrorCode.POST_TITLE_REQUIRED);
         }
         if (title.length() > MAX_TITLE_LENGTH) {
-            throw new IllegalArgumentException("제목은 50자 이하여야 합니다!");
+            throw new PostException(PostErrorCode.POST_TITLE_TOO_LONG);
         }
     }
 
     // 내용 검증
     public void validateContent(String content) {
         if (content == null || content.isBlank()) {
-            throw new IllegalArgumentException("내용은 필수입니다!");
+            throw new PostException(PostErrorCode.POST_CONTENT_REQUIRED);
         }
     }
 

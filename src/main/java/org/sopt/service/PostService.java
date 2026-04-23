@@ -4,7 +4,8 @@ import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.*;
-import org.sopt.exception.PostNotFoundException;
+import org.sopt.exception.PostErrorCode;
+import org.sopt.exception.PostException;
 import org.sopt.repository.PostRepository;
 import org.sopt.validator.PostValidator;
 import org.springframework.stereotype.Service;
@@ -46,14 +47,14 @@ public class PostService {
         // ID로 게시글 조회, 존재하지 않으면 예외 발생
         return postRepository.findById(id)
                 .map(PostResponse::from)
-                .orElseThrow(() -> new PostNotFoundException(id));
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
     }
 
     // UPDATE
     public UpdatePostResponse updatePost(Long id, UpdatePostRequest request) {
         // ID로 게시글 조회, 존재하지 않으면 예외 발생
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(id));
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
         // 새로운 제목, 내용 유효성 검증 후 업데이트
         postValidator.validate(request.title(), request.content());
         post.update(request.title(), request.content());
@@ -64,7 +65,7 @@ public class PostService {
     public DeletePostResponse deletePost(Long id) {
         boolean isDeleted = postRepository.deleteById(id);
         if (!isDeleted) {
-            throw new PostNotFoundException(id);
+            throw new PostException(PostErrorCode.POST_NOT_FOUND);
         }
         return new DeletePostResponse(id);
     }

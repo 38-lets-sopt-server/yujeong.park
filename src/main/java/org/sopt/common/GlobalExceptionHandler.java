@@ -1,7 +1,5 @@
 package org.sopt.common;
 
-import org.sopt.exception.PostNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -9,24 +7,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePostNotFound(PostNotFoundException e) {
+    // CustomException을 상속한 모든 예외 처리
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCustomException(CustomException e) {
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(e.getMessage()));
+                .status(e.getErrorCode().getHttpStatus())
+                .body(ApiResponse.error(e.getErrorCode()));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(e.getMessage()));
-    }
-
+    // 그 외 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("서버 내부 오류가 발생했습니다."));
+                .status(CommonErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus())
+                .body(ApiResponse.error(CommonErrorCode.INTERNAL_SERVER_ERROR));
     }
 }

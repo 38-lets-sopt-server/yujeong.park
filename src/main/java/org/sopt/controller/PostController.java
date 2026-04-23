@@ -29,7 +29,7 @@ public class PostController {
         CreatePostResponse response = postService.createPost(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("게시글 등록 완료!", response));
+                .body(ApiResponse.created("게시글 등록 완료!", response));
     }
 
     // GET /posts
@@ -37,7 +37,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<List<PostListResponse>>> getAllPosts() {
         List<PostListResponse> posts = postService.getAllPosts();
         return ResponseEntity
-                .ok(ApiResponse.success("게시글 목록 조회 완료!", posts));
+                .ok(ApiResponse.ok("게시글 목록 조회 완료!", posts));
     }
 
     // GET /posts/{id}
@@ -47,7 +47,7 @@ public class PostController {
     ) {
         PostResponse post = postService.getPost(id);
         return ResponseEntity
-                .ok(ApiResponse.success("게시글 단건 조회 완료!", post));
+                .ok(ApiResponse.ok("게시글 단건 조회 완료!", post));
     }
 
     // PUT /posts/{id}
@@ -58,7 +58,7 @@ public class PostController {
     ) {
         UpdatePostResponse response = postService.updatePost(id, request);
         return ResponseEntity
-                .ok(ApiResponse.success("게시글 수정 완료!", response));
+                .ok(ApiResponse.ok("게시글 수정 완료!", response));
     }
 
     // DELETE /posts/{id}
@@ -68,6 +68,6 @@ public class PostController {
     ) {
         DeletePostResponse response = postService.deletePost(id);
         return ResponseEntity
-                .ok(ApiResponse.success("게시글 삭제 완료!", response));
+                .ok(ApiResponse.ok("게시글 삭제 완료!", response));
     }
 }
