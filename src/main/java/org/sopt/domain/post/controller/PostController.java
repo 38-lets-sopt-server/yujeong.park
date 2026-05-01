@@ -1,5 +1,6 @@
 package org.sopt.domain.post.controller;
 
+import jakarta.validation.Valid;
 import org.sopt.domain.post.dto.response.*;
 import org.sopt.global.api.CommonResponse;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
@@ -24,7 +25,7 @@ public class PostController {
     // POST /posts
     @PostMapping
     public ResponseEntity<CommonResponse<CreatePostResponse>> createPost(
-            @RequestBody CreatePostRequest request
+            @Valid @RequestBody CreatePostRequest request
     ) {
         CreatePostResponse response = postService.createPost(request);
         return ResponseEntity
@@ -54,7 +55,7 @@ public class PostController {
     @PutMapping("/{id}")
     public ResponseEntity<CommonResponse<UpdatePostResponse>> updatePost(
             @PathVariable Long id,
-            @RequestBody UpdatePostRequest request
+            @Valid @RequestBody UpdatePostRequest request
     ) {
         UpdatePostResponse response = postService.updatePost(id, request);
         return ResponseEntity

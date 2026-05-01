@@ -32,4 +32,8 @@ public record CommonResponse<T>(
     public static <T> CommonResponse<T> error(ErrorCode errorCode) {
         return new CommonResponse<>(false, errorCode.getCode(), errorCode.getMessage(), null);
     }
+
+    public static <T> CommonResponse<T> error(ErrorCode errorCode, T data) {
+        return new CommonResponse<>(false, errorCode.getCode(), errorCode.getMessage(), data);
+    }
 }

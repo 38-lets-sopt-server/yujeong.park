@@ -7,7 +7,6 @@ import org.sopt.domain.post.entity.Post;
 import org.sopt.domain.post.exception.PostErrorCode;
 import org.sopt.domain.post.exception.PostException;
 import org.sopt.domain.post.repository.PostRepository;
-import org.sopt.domain.post.validator.PostValidator;
 import org.sopt.domain.user.entity.User;
 import org.sopt.domain.user.exception.UserErrorCode;
 import org.sopt.domain.user.exception.UserException;
@@ -21,12 +20,10 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostValidator postValidator;
     private final UserRepository userRepository;
 
-    public PostService(PostRepository postRepository, PostValidator postValidator, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
-        this.postValidator = postValidator;
         this.userRepository = userRepository;
     }
 
@@ -36,9 +33,6 @@ public class PostService {
         // ID로 유저 조회, 존재하지 않으면 예외 발생
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        // 제목, 내용 유효성 검증
-        postValidator.validate(request.title(), request.content());
 
         // 게시글 생성 및 저장
         Post post = new Post(request.title(), request.content(), user);
@@ -71,8 +65,7 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
 
-        // 새로운 제목, 내용 유효성 검증 후 업데이트
-        postValidator.validate(request.title(), request.content());
+        // 새로운 제목, 내용 업데이트
         post.update(request.title(), request.content());
         return UpdatePostResponse.from(post);
     }
