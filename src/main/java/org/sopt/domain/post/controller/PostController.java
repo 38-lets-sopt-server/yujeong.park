@@ -1,5 +1,10 @@
 package org.sopt.domain.post.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.sopt.domain.post.dto.response.*;
 import org.sopt.global.api.CommonResponse;
@@ -12,8 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Post", description = "게시글 API")
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/v1/posts")
 public class PostController {
 
     private final PostService postService;
@@ -22,7 +28,12 @@ public class PostController {
         this.postService = postService;
     }
 
-    // POST /posts
+    @Operation(summary = "게시글 작성", description = "새로운 게시글을 작성합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "게시글 작성 성공"),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패 (제목/내용 누락 또는 제목 50자 초과)"),
+            @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음")
+    })
     @PostMapping
     public ResponseEntity<CommonResponse<CreatePostResponse>> createPost(
             @Valid @RequestBody CreatePostRequest request
@@ -33,7 +44,10 @@ public class PostController {
                 .body(CommonResponse.created("게시글 등록 완료!", response));
     }
 
-    // GET /posts
+    @Operation(summary = "게시글 목록 조회", description = "전체 게시글 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
     @GetMapping
     public ResponseEntity<CommonResponse<List<PostListResponse>>> getAllPosts() {
         List<PostListResponse> posts = postService.getAllPosts();
@@ -41,9 +55,14 @@ public class PostController {
                 .ok(CommonResponse.ok("게시글 목록 조회 완료!", posts));
     }
 
-    // GET /posts/{id}
+    @Operation(summary = "게시글 단건 조회", description = "게시글 ID로 특정 게시글을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<PostResponse>> getPost(
+            @Parameter(description = "조회할 게시글 ID", example = "1", required = true)
             @PathVariable Long id
     ) {
         PostResponse post = postService.getPost(id);
@@ -51,9 +70,15 @@ public class PostController {
                 .ok(CommonResponse.ok("게시글 단건 조회 완료!", post));
     }
 
-    // PUT /posts/{id}
+    @Operation(summary = "게시글 수정", description = "게시글 ID로 특정 게시글을 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패 (제목/내용 누락 또는 제목 50자 초과)"),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<CommonResponse<UpdatePostResponse>> updatePost(
+            @Parameter(description = "수정할 게시글 ID", example = "1", required = true)
             @PathVariable Long id,
             @Valid @RequestBody UpdatePostRequest request
     ) {
@@ -62,9 +87,14 @@ public class PostController {
                 .ok(CommonResponse.ok("게시글 수정 완료!", response));
     }
 
-    // DELETE /posts/{id}
+    @Operation(summary = "게시글 삭제", description = "게시글 ID로 특정 게시글을 삭제합니다. soft delete 처리됩니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<CommonResponse<DeletePostResponse>> deletePost(
+            @Parameter(description = "삭제할 게시글 ID", example = "1", required = true)
             @PathVariable Long id
     ) {
         DeletePostResponse response = postService.deletePost(id);
