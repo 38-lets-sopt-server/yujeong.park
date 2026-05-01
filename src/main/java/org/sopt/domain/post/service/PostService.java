@@ -1,9 +1,11 @@
 package org.sopt.domain.post.service;
 
-import org.sopt.domain.like.repository.LikeRepository;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.request.UpdatePostRequest;
-import org.sopt.domain.post.dto.response.*;
+import org.sopt.domain.post.dto.response.CreatePostResponse;
+import org.sopt.domain.post.dto.response.PostListResponse;
+import org.sopt.domain.post.dto.response.PostResponse;
+import org.sopt.domain.post.dto.response.UpdatePostResponse;
 import org.sopt.domain.post.entity.Post;
 import org.sopt.domain.post.exception.PostErrorCode;
 import org.sopt.domain.post.exception.PostException;
@@ -22,12 +24,10 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final LikeRepository likeRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
-        this.likeRepository = likeRepository;
     }
 
     // CREATE
@@ -86,7 +86,7 @@ public class PostService {
     // 게시글 검색
     @Transactional(readOnly = true)
     public List<PostListResponse> search(String title, String nickname) {
-        return postRepository.search(title, nickname)
+        return postRepository.searchByTitleAndNickname(title, nickname)
                 .stream()
                 .map(PostListResponse::from)
                 .toList();

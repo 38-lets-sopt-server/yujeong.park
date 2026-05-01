@@ -12,6 +12,7 @@ import org.sopt.domain.user.entity.User;
 import org.sopt.domain.user.exception.UserErrorCode;
 import org.sopt.domain.user.exception.UserException;
 import org.sopt.domain.user.repository.UserRepository;
+import org.sopt.global.aop.OptimisticLock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class LikeService {
     }
 
     // 좋아요 추가
+    @OptimisticLock
     @Transactional
     public void addLike(Long postId, Long userId) {
         User user = userRepository.findById(userId)
@@ -47,6 +49,7 @@ public class LikeService {
     }
 
     // 좋아요 취소
+    @OptimisticLock
     @Transactional
     public void cancelLike(Long postId, Long userId) {
         User user = userRepository.findById(userId)

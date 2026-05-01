@@ -17,6 +17,9 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     private String title;
 
     private String content;
@@ -50,5 +53,10 @@ public class Post extends BaseTimeEntity {
     }
 
     public void increaseLikeCount() { this.likeCount++; }
-    public void decreaseLikeCount() { this.likeCount--; }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
 }
