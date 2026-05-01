@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.sopt.domain.user.entity.User;
-import org.sopt.global.BaseTimeEntity;
+import org.sopt.global.entity.BaseTimeEntity;
 
 import java.time.LocalDateTime;
 

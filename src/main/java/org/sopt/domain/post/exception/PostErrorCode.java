@@ -1,6 +1,6 @@
 package org.sopt.domain.post.exception;
 
-import org.sopt.global.code.ErrorCode;
+import org.sopt.global.api.code.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum PostErrorCode implements ErrorCode {

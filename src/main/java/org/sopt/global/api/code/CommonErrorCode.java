@@ -1,17 +1,17 @@
-package org.sopt.global.code;
+package org.sopt.global.api.code;
 
 import org.springframework.http.HttpStatus;
 
-public enum CommonSuccessCode implements SuccessCode {
+public enum CommonErrorCode implements ErrorCode {
 
-    OK(HttpStatus.OK, "COMMON_200", "요청이 성공했습니다."),
-    CREATED(HttpStatus.CREATED, "COMMON_201", "생성이 완료되었습니다.");
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_400", "잘못된 요청입니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "서버 내부 오류가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
 
-    CommonSuccessCode(HttpStatus httpStatus, String code, String message) {
+    CommonErrorCode(HttpStatus httpStatus, String code, String message) {
         this.httpStatus = httpStatus;
         this.code = code;
         this.message = message;

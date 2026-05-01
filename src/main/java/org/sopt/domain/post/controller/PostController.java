@@ -1,7 +1,7 @@
 package org.sopt.domain.post.controller;
 
 import org.sopt.domain.post.dto.response.*;
-import org.sopt.global.CommonResponse;
+import org.sopt.global.api.CommonResponse;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.service.PostService;

@@ -1,7 +1,7 @@
-package org.sopt.global;
+package org.sopt.global.api;
 
-import org.sopt.global.code.CommonSuccessCode;
-import org.sopt.global.code.ErrorCode;
+import org.sopt.global.api.code.CommonSuccessCode;
+import org.sopt.global.api.code.ErrorCode;
 
 public record CommonResponse<T>(
         boolean success,
