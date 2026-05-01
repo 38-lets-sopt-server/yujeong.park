@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.domain.like.service.LikeService;
 import org.sopt.global.api.CommonResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +36,9 @@ public class LikeController {
             @PathVariable Long postId
     ) {
         likeService.addLike(postId, userId);
-        return ResponseEntity.ok(CommonResponse.ok("좋아요 추가 완료!"));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(CommonResponse.created("좋아요 추가 완료!"));
     }
 
     @Operation(summary = "좋아요 취소", description = "게시글에 좋아요를 취소합니다.")
