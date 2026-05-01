@@ -2,13 +2,14 @@ package org.sopt.global.exception;
 
 import org.sopt.global.api.CommonResponse;
 import org.sopt.global.api.code.CommonErrorCode;
-import org.springframework.http.HttpStatus;
+import org.sopt.global.api.code.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,13 +43,26 @@ public class GlobalExceptionHandler {
                 .body(CommonResponse.error(CommonErrorCode.BAD_REQUEST, errors));
     }
 
+    // Path Variable, Query Parameter 타입 불일치
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<CommonResponse<Void>> handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException e
+    ) {
+        boolean isPathVariable = e.getParameter().hasParameterAnnotation(PathVariable.class);
+        ErrorCode errorCode = isPathVariable
+                ? CommonErrorCode.INVALID_PATH_VARIABLE
+                : CommonErrorCode.INVALID_QUERY_PARAMETER;
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(CommonResponse.error(errorCode));
+    }
 
     // JSON 파싱 실패
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<CommonResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return ResponseEntity
-                .status(CommonErrorCode.BAD_REQUEST.getHttpStatus())
-                .body(CommonResponse.error(CommonErrorCode.BAD_REQUEST));
+                .status(CommonErrorCode.INVALID_JSON.getHttpStatus())
+                .body(CommonResponse.error(CommonErrorCode.INVALID_JSON));
     }
 
     // 그 외 예외 처리
