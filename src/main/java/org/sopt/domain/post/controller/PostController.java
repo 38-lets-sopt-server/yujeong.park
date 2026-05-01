@@ -93,12 +93,26 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse<DeletePostResponse>> deletePost(
+    public ResponseEntity<CommonResponse<Void>> deletePost(
             @Parameter(description = "삭제할 게시글 ID", example = "1", required = true)
             @PathVariable Long id
     ) {
-        DeletePostResponse response = postService.deletePost(id);
-        return ResponseEntity
-                .ok(CommonResponse.ok("게시글 삭제 완료!", response));
+        postService.deletePost(id);
+        return ResponseEntity.ok(CommonResponse.ok("게시글 삭제 완료!"));
+    }
+
+    @Operation(summary = "게시글 검색", description = "제목 키워드 또는 작성자 닉네임으로 게시글을 검색합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "검색 성공")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<CommonResponse<List<PostListResponse>>> searchPosts(
+            @Parameter(description = "제목 키워드", example = "학식")
+            @RequestParam(required = false) String title,
+            @Parameter(description = "작성자 닉네임", example = "익명")
+            @RequestParam(required = false) String nickname
+    ) {
+        List<PostListResponse> posts = postService.search(title, nickname);
+        return ResponseEntity.ok(CommonResponse.ok("게시글 검색 완료!", posts));
     }
 }

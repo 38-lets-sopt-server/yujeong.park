@@ -21,6 +21,8 @@ public class Post extends BaseTimeEntity {
 
     private String content;
 
+    private int likeCount = 0;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
@@ -39,10 +41,14 @@ public class Post extends BaseTimeEntity {
     public Long getId() { return this.id; }
     public String getTitle() { return this.title; }
     public String getContent() { return this.content; }
+    public int getLikeCount() { return likeCount; }
     public User getUser() { return this.user; }
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
     }
+
+    public void increaseLikeCount() { this.likeCount++; }
+    public void decreaseLikeCount() { this.likeCount--; }
 }

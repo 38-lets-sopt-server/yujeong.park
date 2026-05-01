@@ -1,5 +1,6 @@
 package org.sopt.domain.post.service;
 
+import org.sopt.domain.like.repository.LikeRepository;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.dto.response.*;
@@ -21,10 +22,12 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.likeRepository = likeRepository;
     }
 
     // CREATE
@@ -43,7 +46,7 @@ public class PostService {
     // READ - 전체
     @Transactional(readOnly = true)
     public List<PostListResponse> getAllPosts() {
-        return postRepository.findAll()
+        return postRepository.findAllWithUser()
                 .stream()
                 .map(PostListResponse::from)
                 .toList();
@@ -53,9 +56,10 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostResponse getPost(Long id) {
         // ID로 게시글 조회, 존재하지 않으면 예외 발생
-        return postRepository.findById(id)
-                .map(PostResponse::from)
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
+
+        return PostResponse.from(post);
     }
 
     // UPDATE
@@ -72,13 +76,19 @@ public class PostService {
 
     // DELETE
     @Transactional
-    public DeletePostResponse deletePost(Long id) {
+    public void deletePost(Long id) {
         // ID로 게시글 조회, 존재하지 않으면 예외 발생
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
-
-        // 게시글 삭제
         postRepository.delete(post);
-        return new DeletePostResponse(id);
+    }
+
+    // 게시글 검색
+    @Transactional(readOnly = true)
+    public List<PostListResponse> search(String title, String nickname) {
+        return postRepository.search(title, nickname)
+                .stream()
+                .map(PostListResponse::from)
+                .toList();
     }
 }

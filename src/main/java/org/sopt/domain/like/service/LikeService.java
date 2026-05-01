@@ -43,6 +43,7 @@ public class LikeService {
         }
 
         likeRepository.save(new Like(user, post));
+        post.increaseLikeCount();
     }
 
     // 좋아요 취소
@@ -59,6 +60,7 @@ public class LikeService {
                 .orElseThrow(() -> new LikeException(LikeErrorCode.LIKE_NOT_FOUND));
 
         likeRepository.delete(like);
+        post.decreaseLikeCount();
     }
 
 }
