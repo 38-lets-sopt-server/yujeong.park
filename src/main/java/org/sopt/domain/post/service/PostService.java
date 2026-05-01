@@ -41,8 +41,7 @@ public class PostService {
         postValidator.validate(request.title(), request.content());
 
         // 게시글 생성 및 저장
-        String createdAt = java.time.LocalDateTime.now().toString();
-        Post post = new Post(request.title(), request.content(), user, createdAt);
+        Post post = new Post(request.title(), request.content(), user);
         postRepository.save(post);
         return CreatePostResponse.from(post);
     }
