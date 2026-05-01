@@ -1,6 +1,7 @@
 package org.sopt.common;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -13,6 +14,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(e.getErrorCode().getHttpStatus())
                 .body(ApiResponse.error(e.getErrorCode()));
+    }
+
+    // JSON 파싱 실패
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return ResponseEntity
+                .status(CommonErrorCode.BAD_REQUEST.getHttpStatus())
+                .body(ApiResponse.error(CommonErrorCode.BAD_REQUEST));
     }
 
     // 그 외 예외 처리
