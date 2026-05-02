@@ -1,6 +1,6 @@
 package org.sopt.domain.user.exception;
 
-import org.sopt.global.CustomException;
+import org.sopt.global.exception.CustomException;
 
 public class UserException extends CustomException {
 

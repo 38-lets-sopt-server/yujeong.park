@@ -1,4 +1,4 @@
-package org.sopt.global.code;
+package org.sopt.global.api.code;
 
 import org.springframework.http.HttpStatus;
 

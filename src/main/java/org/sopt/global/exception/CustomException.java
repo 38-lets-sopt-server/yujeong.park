@@ -1,6 +1,6 @@
-package org.sopt.global;
+package org.sopt.global.exception;
 
-import org.sopt.global.code.ErrorCode;
+import org.sopt.global.api.code.ErrorCode;
 
 public class CustomException extends RuntimeException {
 

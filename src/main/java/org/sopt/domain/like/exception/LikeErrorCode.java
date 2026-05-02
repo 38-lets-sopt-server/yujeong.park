@@ -1,17 +1,18 @@
-package org.sopt.global.code;
+package org.sopt.domain.like.exception;
 
+import org.sopt.global.api.code.ErrorCode;
 import org.springframework.http.HttpStatus;
 
-public enum CommonSuccessCode implements SuccessCode {
+public enum LikeErrorCode implements ErrorCode {
 
-    OK(HttpStatus.OK, "COMMON_200", "요청이 성공했습니다."),
-    CREATED(HttpStatus.CREATED, "COMMON_201", "생성이 완료되었습니다.");
+    LIKE_ALREADY_EXISTS(HttpStatus.CONFLICT, "LIKE_001", "해당 게시글에 이미 좋아요를 눌렀습니다."),
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKE_002", "해당 게시글에 좋아요가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
 
-    CommonSuccessCode(HttpStatus httpStatus, String code, String message) {
+    LikeErrorCode(HttpStatus httpStatus, String code, String message) {
         this.httpStatus = httpStatus;
         this.code = code;
         this.message = message;
