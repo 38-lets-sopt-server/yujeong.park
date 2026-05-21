@@ -1,5 +1,6 @@
 package org.sopt.domain.like.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.like.entity.Like;
 import org.sopt.domain.like.exception.LikeErrorCode;
 import org.sopt.domain.like.exception.LikeException;
@@ -17,17 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LikeService {
 
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-
-    public LikeService(LikeRepository likeRepository, PostRepository postRepository, UserRepository userRepository) {
-        this.likeRepository = likeRepository;
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-    }
 
     // 좋아요 추가
     @OptimisticLock
