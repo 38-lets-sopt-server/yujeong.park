@@ -9,11 +9,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.auth.dto.TokenResult;
 import org.sopt.domain.auth.dto.request.LoginRequest;
+import org.sopt.domain.auth.dto.request.SignUpRequest;
+import org.sopt.domain.auth.dto.response.SignUpResponse;
 import org.sopt.domain.auth.dto.response.TokenResponse;
 import org.sopt.domain.auth.service.AuthService;
 import org.sopt.global.api.CommonResponse;
 import org.sopt.global.security.jwt.JwtProperties;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -30,6 +33,22 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtProperties jwtProperties;
+
+    @Operation(summary = "회원가입", description = "새로운 유저를 등록합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원가입 성공"),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패"),
+            @ApiResponse(responseCode = "409", description = "이미 사용 중인 이메일")
+    })
+    @PostMapping("/sign-up")
+    public ResponseEntity<CommonResponse<SignUpResponse>> signUp(
+            @Valid @RequestBody SignUpRequest request
+    ) {
+        SignUpResponse response = authService.signUp(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(CommonResponse.created("회원가입 완료!", response));
+    }
 
     @Operation(summary = "로그인", description = "이메일/비밀번호로 로그인합니다. Access Token은 Response Body, Refresh Token은 HttpOnly 쿠키로 반환됩니다.")
     @ApiResponses({

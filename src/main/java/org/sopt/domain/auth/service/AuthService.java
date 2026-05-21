@@ -3,6 +3,8 @@ package org.sopt.domain.auth.service;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.auth.dto.TokenResult;
+import org.sopt.domain.auth.dto.request.SignUpRequest;
+import org.sopt.domain.auth.dto.response.SignUpResponse;
 import org.sopt.domain.auth.entity.RefreshToken;
 import org.sopt.domain.auth.exception.AuthErrorCode;
 import org.sopt.domain.auth.exception.AuthException;
@@ -13,6 +15,7 @@ import org.sopt.domain.user.exception.UserException;
 import org.sopt.domain.user.repository.UserRepository;
 import org.sopt.global.security.jwt.JwtProperties;
 import org.sopt.global.security.jwt.JwtService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +28,32 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    // 회원가입
+    @Transactional
+    public SignUpResponse signUp(SignUpRequest request) {
+        // 이메일 중복 확인
+        if (userRepository.existsByEmail(request.email())) {
+            throw new AuthException(AuthErrorCode.EMAIL_DUPLICATED);
+        }
+
+        // 비밀번호 암호화 후 저장
+        User user = new User(
+                request.nickname(), request.email(), passwordEncoder.encode(request.password())
+        );
+        userRepository.save(user);
+
+        return SignUpResponse.from(user);
+    }
 
     // 이메일/비밀번호 검증 후 유저 반환
     private User loginWithCredentials(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        if (!user.getPassword().equals(password)) {
+        // 평문 비밀번호와 암호화된 비밀번호 비교
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS);
         }
 

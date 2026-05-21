@@ -16,6 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    // 내 정보 조회
     public UserResponse getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
