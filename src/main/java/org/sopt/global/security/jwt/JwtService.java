@@ -57,7 +57,6 @@ public class JwtService {
             DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
             return Long.parseLong(jwt.getSubject());
         } catch (TokenExpiredException e) {
-            // 만료된 토큰은 별도 에러코드로 구분 (클라이언트가 재발급 요청을 보낼 수 있도록)
             throw new CustomException(AuthErrorCode.EXPIRED_TOKEN);
         } catch (JWTVerificationException | NumberFormatException e) {
             throw new CustomException(AuthErrorCode.INVALID_TOKEN);
