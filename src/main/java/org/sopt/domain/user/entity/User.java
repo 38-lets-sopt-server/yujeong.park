@@ -1,8 +1,13 @@
 package org.sopt.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
 public class User {
 
@@ -16,16 +21,9 @@ public class User {
 
     private String password;
 
-    protected User() { }
-
     public User(String nickname, String email, String password) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
     }
-
-    public Long getId() { return this.id; }
-    public String getNickname() { return this.nickname; }
-    public String getEmail() { return this.email; }
-    public String getPassword() { return this.password; }
 }

@@ -1,5 +1,6 @@
 package org.sopt.domain.post.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.dto.response.CreatePostResponse;
@@ -20,21 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-    }
-
     // CREATE
     @Transactional
-    public CreatePostResponse createPost(CreatePostRequest request) {
+    public CreatePostResponse createPost(Long userId, CreatePostRequest request) {
         // ID로 유저 조회, 존재하지 않으면 예외 발생
-        User user = userRepository.findById(request.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
         // 게시글 생성 및 저장
@@ -44,7 +42,6 @@ public class PostService {
     }
 
     // READ - 전체
-    @Transactional(readOnly = true)
     public List<PostListResponse> getAllPosts() {
         return postRepository.findAllWithUser()
                 .stream()
@@ -53,7 +50,6 @@ public class PostService {
     }
 
     // READ - 단건
-    @Transactional(readOnly = true)
     public PostResponse getPost(Long id) {
         // ID로 게시글 조회, 존재하지 않으면 예외 발생
         Post post = postRepository.findById(id)
@@ -64,10 +60,15 @@ public class PostService {
 
     // UPDATE
     @Transactional
-    public UpdatePostResponse updatePost(Long id, UpdatePostRequest request) {
+    public UpdatePostResponse updatePost(Long userId, Long postId, UpdatePostRequest request) {
         // ID로 게시글 조회, 존재하지 않으면 예외 발생
-        Post post = postRepository.findById(id)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
+
+        // 게시글 작성자와 요청자가 다를 경우 예외 발생
+        if (!post.getUser().getId().equals(userId)) {
+            throw new PostException(PostErrorCode.POST_FORBIDDEN);
+        }
 
         // 새로운 제목, 내용 업데이트
         post.update(request.title(), request.content());
@@ -76,15 +77,20 @@ public class PostService {
 
     // DELETE
     @Transactional
-    public void deletePost(Long id) {
+    public void deletePost(Long userId, Long postId) {
         // ID로 게시글 조회, 존재하지 않으면 예외 발생
-        Post post = postRepository.findById(id)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
+
+        // 게시글 작성자와 요청자가 다를 경우 예외 발생
+        if (!post.getUser().getId().equals(userId)) {
+            throw new PostException(PostErrorCode.POST_FORBIDDEN);
+        }
+
         postRepository.delete(post);
     }
 
     // 게시글 검색
-    @Transactional(readOnly = true)
     public List<PostListResponse> search(String title, String nickname) {
         return postRepository.searchByTitleAndNickname(title, nickname)
                 .stream()

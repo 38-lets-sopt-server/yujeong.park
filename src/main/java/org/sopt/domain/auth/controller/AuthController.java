@@ -1,52 +1,97 @@
 package org.sopt.domain.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.sopt.domain.auth.dto.TokenResult;
 import org.sopt.domain.auth.dto.request.LoginRequest;
-import org.sopt.domain.auth.dto.request.ReissueRequest;
+import org.sopt.domain.auth.dto.request.SignUpRequest;
+import org.sopt.domain.auth.dto.response.SignUpResponse;
 import org.sopt.domain.auth.dto.response.TokenResponse;
 import org.sopt.domain.auth.service.AuthService;
-import org.sopt.domain.user.dto.response.UserResponse;
 import org.sopt.global.api.CommonResponse;
+import org.sopt.global.security.jwt.JwtProperties;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Auth", description = "인증 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtProperties jwtProperties;
 
-    @Operation(summary = "로그인 (Access Token + Refresh Token 발급)")
+    @Operation(summary = "회원가입", description = "새로운 유저를 등록합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원가입 성공"),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패"),
+            @ApiResponse(responseCode = "409", description = "이미 사용 중인 이메일")
+    })
+    @PostMapping("/sign-up")
+    public ResponseEntity<CommonResponse<SignUpResponse>> signUp(
+            @Valid @RequestBody SignUpRequest request
+    ) {
+        SignUpResponse response = authService.signUp(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(CommonResponse.created("회원가입 완료!", response));
+    }
+
+    @Operation(summary = "로그인", description = "이메일/비밀번호로 로그인합니다. Access Token은 Response Body, Refresh Token은 HttpOnly 쿠키로 반환됩니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패 (이메일/비밀번호 누락)"),
+            @ApiResponse(responseCode = "401", description = "이메일 또는 비밀번호 불일치"),
+            @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음")
+    })
     @PostMapping("/login")
     public ResponseEntity<CommonResponse<TokenResponse>> login(
-            @Valid @RequestBody LoginRequest request
+            @Valid @RequestBody LoginRequest request,
+            HttpServletResponse response
     ) {
-        TokenResponse tokens = authService.login(request.email(), request.password());
-        return ResponseEntity.ok(CommonResponse.ok("로그인 완료!", tokens));
+        TokenResult result = authService.login(request.email(), request.password());
+        setRefreshTokenCookie(response, result.refreshToken());
+        return ResponseEntity.ok(CommonResponse.ok("로그인 완료!", TokenResponse.from(result)));
     }
 
-    @Operation(summary = "토큰 재발급 (Refresh Token → 새 Access Token + Refresh Token)")
+    @Operation(summary = "토큰 재발급", description = "HttpOnly 쿠키의 Refresh Token으로 새 Access Token과 Refresh Token을 발급합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
+            @ApiResponse(responseCode = "401", description = "리프레시 토큰이 존재하지 않거나 만료됨"),
+            @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음")
+    })
     @PostMapping("/reissue")
     public ResponseEntity<CommonResponse<TokenResponse>> reissue(
-            @Valid @RequestBody ReissueRequest request
+            @CookieValue("refreshToken") String refreshToken,
+            HttpServletResponse response
     ) {
-        TokenResponse tokens = authService.reissue(request.refreshToken());
-        return ResponseEntity.ok(CommonResponse.ok("토큰 재발급 완료!", tokens));
+        TokenResult result = authService.reissue(refreshToken);
+        setRefreshTokenCookie(response, result.refreshToken());
+        return ResponseEntity.ok(CommonResponse.ok("토큰 재발급 완료!", TokenResponse.from(result)));
     }
 
-    @Operation(summary = "내 정보 조회 (Access Token 검증)")
-    @GetMapping("/me")
-    public ResponseEntity<CommonResponse<UserResponse>> me(Authentication authentication) {
-        Long memberId = Long.parseLong(authentication.getName());
-        UserResponse user = authService.getMemberById(memberId);
-        return ResponseEntity.ok(CommonResponse.ok("내 정보 조회 성공!", user));
+    // Refresh Token을 HttpOnly 쿠키로 설정
+    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/api/v1/auth/reissue")
+                .maxAge(jwtProperties.getExpiration().getRefreshTokenExpiresInSeconds())
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }
